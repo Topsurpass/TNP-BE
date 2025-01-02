@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Courses, Lesson, UserCourse, LessonScore, Quiz, CourseCategory
+from .models import (
+    Courses, Lesson,  Quiz, CourseCategory
+)
+
 
 class CourseCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,41 +10,28 @@ class CourseCategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CoursesSerializer(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(
+    category = CourseCategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
         queryset=CourseCategory.objects.all(),
-        required=True,
+        source='category',
         write_only=True
     )
-    course_category = CourseCategorySerializer(source='category', read_only=True)
-    
+
     class Meta:
         model = Courses
         fields = '__all__'
 
 
 class LessonSerializer(serializers.ModelSerializer):
-    course = serializers.PrimaryKeyRelatedField(
+    course = CoursesSerializer(read_only=True)
+    course_id = serializers.PrimaryKeyRelatedField(
         queryset=Courses.objects.all(),
-        required=True,
+        source='course',
         write_only=True
     )
-    
-    course_details = CoursesSerializer(source='course', read_only=True)
-    
+
     class Meta:
         model = Lesson
-        fields = '__all__'
-
-
-class UserCourseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserCourse
-        fields = '__all__'
-
-
-class LessonScoreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LessonScore
         fields = '__all__'
 
 
